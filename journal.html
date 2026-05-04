@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Journal</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1209;
+      --paper: #faf6ee;
+      --paper-dark: #f0e8d6;
+      --sepia: #8b6f47;
+      --sepia-light: #c4a882;
+      --sepia-faint: #e8dcc8;
+      --accent: #c0392b;
+      --accent-soft: #e8c4c0;
+      --shadow: rgba(139, 111, 71, 0.18);
+      --line: rgba(139, 111, 71, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Lora', Georgia, serif;
+      min-height: 100vh;
+      background-image:
+        repeating-linear-gradient(transparent,
+          transparent 27px,
+          var(--line) 27px,
+          var(--line) 28px);
+      background-attachment: fixed;
+    }
+
+    /* ─── AUTH SCREEN ─── */
+    #auth-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .auth-card {
+      background: var(--paper);
+      border: 1px solid var(--sepia-light);
+      border-radius: 2px;
+      padding: 3rem 3.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 40px var(--shadow), inset 0 0 0 6px var(--paper-dark);
+      position: relative;
+    }
+
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      border: 1px solid var(--sepia-faint);
+      pointer-events: none;
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .auth-logo svg {
+      width: 48px;
+      height: 48px;
+      color: var(--sepia);
+      margin-bottom: 0.75rem;
+    }
+
+    .auth-logo h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .auth-logo p {
+      font-style: italic;
+      color: var(--sepia);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--sepia);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--sepia-light);
+      background: var(--paper-dark);
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      color: var(--ink);
+      border-radius: 1px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--sepia);
+      background: var(--paper);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      border-radius: 1px;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      background: var(--sepia);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .auth-toggle {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.88rem;
+      color: var(--sepia);
+    }
+
+    .auth-toggle a {
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .auth-toggle a:hover {
+      text-decoration: underline;
+    }
+
+    .auth-error {
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent);
+      padding: 0.7rem 1rem;
+      font-size: 0.88rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      border-radius: 1px;
+      display: none;
+    }
+
+    /* ─── APP LAYOUT ─── */
+    #app-screen {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(6px);
+    }
+
+    .header-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-brand svg {
+      color: var(--sepia);
+      width: 22px;
+      height: 22px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-user {
+      font-size: 0.82rem;
+      color: var(--sepia);
+      font-style: italic;
+    }
+
+    .btn-icon {
+      background: none;
+      border: 1px solid var(--sepia-light);
+      color: var(--sepia);
+      cursor: pointer;
+      padding: 0.4rem 0.9rem;
+      font-family: 'Lora', serif;
+      font-size: 0.82rem;
+      border-radius: 1px;
+      transition: all 0.15s;
+    }
+
+    .btn-icon:hover {
+      background: var(--sepia-faint);
+      color: var(--ink);
+    }
+
+    .app-body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+
+    /* ─── SEARCH BAR ─── */
+    .search-bar {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--sepia-light);
+      background: var(--paper-dark);
+      font-family: 'Lora', serif;
+      font-size: 0.9rem;
+      color: var(--ink);
+      border-radius: 1px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--sepia);
+      background: var(--paper);
+    }
+
+    .btn-new {
+      padding: 0.6rem 1.3rem;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      font-family: 'Lora', serif;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border-radius: 1px;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .btn-new:hover {
+      background: var(--sepia);
+    }
+
+    /* ─── ENTRY EDITOR ─── */
+    .editor-panel {
+      background: var(--paper);
+      border: 1px solid var(--sepia-light);
+      border-radius: 2px;
+      padding: 2rem 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px var(--shadow);
+      display: none;
+      animation: slideDown 0.25s ease;
+    }
+
+    .editor-panel.open {
+      display: block;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .editor-date {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--sepia);
+      margin-bottom: 1rem;
+    }
+
+    .editor-title {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--ink);
+      outline: none;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.5rem;
+    }
+
+    .editor-title::placeholder {
+      color: var(--sepia-light);
+      font-style: italic;
+    }
+
+    .editor-body {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-family: 'Lora', serif;
+      font-size: 1rem;
+      line-height: 1.9;
+      color: var(--ink);
+      outline: none;
+      resize: none;
+      min-height: 220px;
+    }
+
+    .editor-body::placeholder {
+      color: var(--sepia-light);
+      font-style: italic;
+    }
+
+    .editor-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .btn-cancel {
+      padding: 0.55rem 1.2rem;
+      background: none;
+      border: 1px solid var(--sepia-light);
+      color: var(--sepia);
+      font-family: 'Lora', serif;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border-radius: 1px;
+      transition: all 0.15s;
+    }
+
+    .btn-cancel:hover {
+      background: var(--sepia-faint);
+    }
+
+    .btn-save {
+      padding: 0.55rem 1.4rem;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      font-family: 'Lora', serif;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border-radius: 1px;
+      transition: background 0.15s;
+    }
+
+    .btn-save:hover {
+      background: var(--sepia);
+    }
+
+    /* ─── ENTRIES LIST ─── */
+    .entries-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .entries-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--sepia);
+      font-style: italic;
+    }
+
+    .entries-count {
+      font-size: 0.78rem;
+      color: var(--sepia-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .entries-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .entry-card {
+      background: var(--paper);
+      border: 1px solid var(--sepia-light);
+      border-radius: 1px;
+      padding: 1.5rem 1.75rem;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .entry-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--sepia-faint);
+      transition: background 0.2s;
+    }
+
+    .entry-card:hover {
+      box-shadow: 0 4px 20px var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .entry-card:hover::before {
+      background: var(--sepia);
+    }
+
+    .entry-card-date {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--sepia-light);
+      margin-bottom: 0.4rem;
+    }
+
+    .entry-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+      line-height: 1.3;
+    }
+
+    .entry-card-preview {
+      font-size: 0.9rem;
+      color: var(--sepia);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .entry-card-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .btn-edit,
+    .btn-delete {
+      padding: 0.3rem 0.8rem;
+      font-family: 'Lora', serif;
+      font-size: 0.78rem;
+      border-radius: 1px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-edit {
+      background: none;
+      border: 1px solid var(--sepia-light);
+      color: var(--sepia);
+    }
+
+    .btn-edit:hover {
+      background: var(--sepia-faint);
+      color: var(--ink);
+    }
+
+    .btn-delete {
+      background: none;
+      border: 1px solid var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .btn-delete:hover {
+      background: var(--accent-soft);
+    }
+
+    /* ─── EMPTY / LOADING STATES ─── */
+    .state-empty {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--sepia-light);
+    }
+
+    .state-empty svg {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .state-empty h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--sepia);
+      margin-bottom: 0.5rem;
+    }
+
+    .state-empty p {
+      font-size: 0.9rem;
+    }
+
+    .loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 3rem;
+    }
+
+    .loading-dots span {
+      width: 8px;
+      height: 8px;
+      background: var(--sepia-light);
+      border-radius: 50%;
+      animation: dot 1.2s infinite;
+    }
+
+    .loading-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loading-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes dot {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+      }
+
+      40% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* ─── ENTRY DETAIL VIEW ─── */
+    .entry-detail {
+      background: var(--paper);
+      border: 1px solid var(--sepia-light);
+      border-radius: 2px;
+      padding: 2.5rem 3rem;
+      box-shadow: 0 4px 20px var(--shadow);
+      display: none;
+      animation: slideDown 0.25s ease;
+    }
+
+    .entry-detail.open {
+      display: block;
+    }
+
+    .detail-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .btn-back {
+      background: none;
+      border: none;
+      color: var(--sepia);
+      font-family: 'Lora', serif;
+      font-size: 0.88rem;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-back:hover {
+      color: var(--ink);
+    }
+
+    .detail-date {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--sepia-light);
+      margin-bottom: 0.75rem;
+    }
+
+    .detail-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.25;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail-body {
+      font-size: 1rem;
+      line-height: 2;
+      color: var(--ink);
+      white-space: pre-wrap;
+    }
+
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0.75rem 1.5rem;
+      font-family: 'Lora', serif;
+      font-size: 0.88rem;
+      border-radius: 1px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ─── MISC ─── */
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 2rem 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ AUTH SCREEN ══ -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+        </svg>
+        <h1>My Journal</h1>
+        <p>A private space for your thoughts</p>
+      </div>
+
+      <div class="auth-error" id="auth-error"></div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <button class="btn-primary" id="auth-btn">Sign In</button>
+
+      <div class="auth-toggle">
+        <span id="auth-toggle-text">Don't have an account?</span>
+        <a id="auth-toggle-link"> Sign up</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ APP SCREEN ══ -->
+  <div id="app-screen">
+    <header class="app-header">
+      <div class="header-brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+        </svg>
+        My Journal
+      </div>
+      <div class="header-actions">
+        <span class="header-user" id="header-email"></span>
+        <button class="btn-icon" id="sign-out-btn">Sign out</button>
+      </div>
+    </header>
+
+    <main class="app-body">
+
+      <!-- Search + New -->
+      <div class="search-bar" id="search-bar">
+        <input type="text" id="search-input" placeholder="Search your entries…" />
+        <button class="btn-new" id="new-entry-btn">+ New Entry</button>
+      </div>
+
+      <!-- Editor -->
+      <div class="editor-panel" id="editor-panel">
+        <div class="editor-date" id="editor-date-label"></div>
+        <input class="editor-title" id="editor-title" placeholder="Give this entry a title…" maxlength="120" />
+        <textarea class="editor-body" id="editor-body" placeholder="What's on your mind today?"></textarea>
+        <div class="editor-actions">
+          <button class="btn-cancel" id="editor-cancel">Cancel</button>
+          <button class="btn-save" id="editor-save">Save Entry</button>
+        </div>
+      </div>
+
+      <!-- Entry Detail -->
+      <div class="entry-detail" id="entry-detail">
+        <div class="detail-nav">
+          <button class="btn-back" id="detail-back">← Back to entries</button>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn-edit" id="detail-edit">Edit</button>
+            <button class="btn-delete" id="detail-delete">Delete</button>
+          </div>
+        </div>
+        <div class="detail-date" id="detail-date"></div>
+        <div class="detail-title" id="detail-title"></div>
+        <div class="detail-body" id="detail-body"></div>
+      </div>
+
+      <!-- Entries List -->
+      <div id="entries-section">
+        <div class="entries-header">
+          <h2>Past entries</h2>
+          <span class="entries-count" id="entries-count"></span>
+        </div>
+        <div id="entries-list">
+          <div class="loading-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ══ FIREBASE SDK ══ -->
+  <script type="module">
+    // ═══════════════════════════════════════════════════════════════
+    //  🔧 PASTE YOUR FIREBASE CONFIG HERE
+    //  Go to: Firebase Console → Project Settings → Your apps → SDK setup
+    // ═══════════════════════════════════════════════════════════════
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMpVIP_zgJNxhXOmcDB_trNGG6N8xGIrQ",
+      authDomain: "journal-7b5da.firebaseapp.com",
+      projectId: "journal-7b5da",
+      storageBucket: "journal-7b5da.firebasestorage.app",
+      messagingSenderId: "589658214634",
+      appId: "1:589658214634:web:8eaa6b899f7b560d768793",
+      measurementId: "G-C7LHQ75YX2"
+    };
+    // ═══════════════════════════════════════════════════════════════
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      query,
+      where,
+      orderBy,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ─── DOM refs ───
+    const authScreen = document.getElementById('auth-screen');
+    const appScreen = document.getElementById('app-screen');
+    const authEmail = document.getElementById('auth-email');
+    const authPassword = document.getElementById('auth-password');
+    const authBtn = document.getElementById('auth-btn');
+    const authError = document.getElementById('auth-error');
+    const authToggleLink = document.getElementById('auth-toggle-link');
+    const authToggleText = document.getElementById('auth-toggle-text');
+    const headerEmail = document.getElementById('header-email');
+    const signOutBtn = document.getElementById('sign-out-btn');
+    const searchInput = document.getElementById('search-input');
+    const newEntryBtn = document.getElementById('new-entry-btn');
+    const editorPanel = document.getElementById('editor-panel');
+    const editorDateLbl = document.getElementById('editor-date-label');
+    const editorTitle = document.getElementById('editor-title');
+    const editorBody = document.getElementById('editor-body');
+    const editorCancel = document.getElementById('editor-cancel');
+    const editorSave = document.getElementById('editor-save');
+    const entriesSection = document.getElementById('entries-section');
+    const entriesList = document.getElementById('entries-list');
+    const entriesCount = document.getElementById('entries-count');
+    const entryDetail = document.getElementById('entry-detail');
+    const detailBack = document.getElementById('detail-back');
+    const detailEdit = document.getElementById('detail-edit');
+    const detailDelete = document.getElementById('detail-delete');
+    const detailDate = document.getElementById('detail-date');
+    const detailTitle = document.getElementById('detail-title');
+    const detailBody = document.getElementById('detail-body');
+    const toastEl = document.getElementById('toast');
+
+    // ─── State ───
+    let isSignUp = false;
+    let currentUser = null;
+    let allEntries = [];
+    let editingId = null;
+    let viewingEntry = null;
+    let unsubscribe = null;
+
+    // ─── Toast ───
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 2800);
+    }
+
+    // ─── Auth toggle ───
+    authToggleLink.addEventListener('click', () => {
+      isSignUp = !isSignUp;
+      authBtn.textContent = isSignUp ? 'Create Account' : 'Sign In';
+      authToggleText.textContent = isSignUp ? 'Already have an account?' : "Don't have an account?";
+      authToggleLink.textContent = isSignUp ? ' Sign in' : ' Sign up';
+      authError.style.display = 'none';
+    });
+
+    // ─── Auth submit ───
+    authBtn.addEventListener('click', async () => {
+      const email = authEmail.value.trim();
+      const pass = authPassword.value;
+      authError.style.display = 'none';
+
+      if (!email || !pass) {
+        authError.textContent = 'Please enter your email and password.';
+        authError.style.display = 'block';
+        return;
+      }
+
+      authBtn.textContent = isSignUp ? 'Creating…' : 'Signing in…';
+      authBtn.disabled = true;
+
+      try {
+        if (isSignUp) {
+          await createUserWithEmailAndPassword(auth, email, pass);
+        } else {
+          await signInWithEmailAndPassword(auth, email, pass);
+        }
+      } catch (e) {
+        authError.textContent = friendlyError(e.code);
+        authError.style.display = 'block';
+        authBtn.textContent = isSignUp ? 'Create Account' : 'Sign In';
+        authBtn.disabled = false;
+      }
+    });
+
+    // allow Enter key
+    [authEmail, authPassword].forEach(el =>
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') authBtn.click(); })
+    );
+
+    function friendlyError(code) {
+      const map = {
+        'auth/user-not-found': 'No account with that email.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/email-already-in-use': 'Email already registered. Sign in instead.',
+        'auth/weak-password': 'Password must be at least 6 characters.',
+        'auth/invalid-email': 'Invalid email address.',
+        'auth/too-many-requests': 'Too many attempts. Try again later.',
+        'auth/invalid-credential': 'Wrong email or password.',
+      };
+      return map[code] || 'Something went wrong. Please try again.';
+    }
+
+    // ─── Sign out ───
+    signOutBtn.addEventListener('click', async () => {
+      if (unsubscribe) unsubscribe();
+      await signOut(auth);
+    });
+
+    // ─── Auth state ───
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+      if (user) {
+        authScreen.style.display = 'none';
+        appScreen.style.display = 'block';
+        headerEmail.textContent = user.email;
+        loadEntries(user.uid);
+      } else {
+        authScreen.style.display = 'flex';
+        appScreen.style.display = 'none';
+        authBtn.textContent = 'Sign In';
+        authBtn.disabled = false;
+        authEmail.value = authPassword.value = '';
+        allEntries = [];
+      }
+    });
+
+    // ─── Load entries (realtime) ───
+    function loadEntries(uid) {
+      entriesList.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+      const q = query(
+        collection(db, 'entries'),
+        where('uid', '==', uid),
+        orderBy('createdAt', 'desc')
+      );
+      unsubscribe = onSnapshot(q, snap => {
+        allEntries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderEntries(allEntries);
+      });
+    }
+
+    // ─── Render entries ───
+    function renderEntries(entries) {
+      const search = searchInput.value.toLowerCase();
+      const filtered = search
+        ? entries.filter(e =>
+          e.title.toLowerCase().includes(search) ||
+          e.body.toLowerCase().includes(search))
+        : entries;
+
+      entriesCount.textContent = filtered.length
+        ? `${filtered.length} entr${filtered.length === 1 ? 'y' : 'ies'}`
+        : '';
+
+      if (!filtered.length) {
+        entriesList.innerHTML = `
+          <div class="state-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
+            </svg>
+            <h3>${search ? 'No entries match your search' : 'Your journal is empty'}</h3>
+            <p>${search ? 'Try different keywords.' : 'Click "+ New Entry" to write your first entry.'}</p>
+          </div>`;
+        return;
+      }
+
+      entriesList.innerHTML = '';
+      filtered.forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'entry-card';
+        card.innerHTML = `
+          <div class="entry-card-date">${formatDate(entry.createdAt)}</div>
+          <div class="entry-card-title">${escHtml(entry.title || 'Untitled')}</div>
+          <div class="entry-card-preview">${escHtml(entry.body)}</div>
+          <div class="entry-card-actions" onclick="event.stopPropagation()">
+            <button class="btn-edit" data-id="${entry.id}">✎ Edit</button>
+            <button class="btn-delete" data-id="${entry.id}">✕ Delete</button>
+          </div>`;
+        card.addEventListener('click', () => openDetail(entry));
+        card.querySelector('.btn-edit').addEventListener('click', e => {
+          e.stopPropagation(); openEditor(entry);
+        });
+        card.querySelector('.btn-delete').addEventListener('click', e => {
+          e.stopPropagation(); deleteEntry(entry.id);
+        });
+        entriesList.appendChild(card);
+      });
+    }
+
+    // ─── Search ───
+    searchInput.addEventListener('input', () => renderEntries(allEntries));
+
+    // ─── New entry button ───
+    newEntryBtn.addEventListener('click', () => openEditor(null));
+
+    // ─── Open editor ───
+    function openEditor(entry) {
+      editingId = entry ? entry.id : null;
+      editorTitle.value = entry ? entry.title : '';
+      editorBody.value = entry ? entry.body : '';
+      editorDateLbl.textContent = entry
+        ? `Editing — ${formatDate(entry.createdAt)}`
+        : `New entry — ${formatDate(null)}`;
+      editorPanel.classList.add('open');
+      entryDetail.classList.remove('open');
+      entriesSection.style.display = 'block';
+      editorTitle.focus();
+      editorPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ─── Cancel editor ───
+    editorCancel.addEventListener('click', () => {
+      editorPanel.classList.remove('open');
+      editingId = null;
+    });
+
+    // ─── Save entry ───
+    editorSave.addEventListener('click', async () => {
+      const title = editorTitle.value.trim();
+      const body = editorBody.value.trim();
+      if (!body && !title) {
+        showToast('Write something first ✍️'); return;
+      }
+      editorSave.textContent = 'Saving…';
+      editorSave.disabled = true;
+
+      try {
+        if (editingId) {
+          await updateDoc(doc(db, 'entries', editingId), {
+            title: title || 'Untitled',
+            body,
+            updatedAt: serverTimestamp()
+          });
+          showToast('Entry updated ✓');
+        } else {
+          await addDoc(collection(db, 'entries'), {
+            uid: currentUser.uid,
+            title: title || 'Untitled',
+            body,
+            createdAt: serverTimestamp()
+          });
+          showToast('Entry saved ✓');
+        }
+        editorPanel.classList.remove('open');
+        editingId = null;
+      } catch (e) {
+        showToast('Error saving. Check Firestore rules.');
+        console.error(e);
+      }
+
+      editorSave.textContent = 'Save Entry';
+      editorSave.disabled = false;
+    });
+
+    // ─── Open detail view ───
+    function openDetail(entry) {
+      viewingEntry = entry;
+      detailDate.textContent = formatDate(entry.createdAt);
+      detailTitle.textContent = entry.title || 'Untitled';
+      detailBody.textContent = entry.body;
+      entryDetail.classList.add('open');
+      entriesSection.style.display = 'none';
+      editorPanel.classList.remove('open');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    detailBack.addEventListener('click', () => {
+      entryDetail.classList.remove('open');
+      entriesSection.style.display = 'block';
+      viewingEntry = null;
+    });
+
+    detailEdit.addEventListener('click', () => {
+      entryDetail.classList.remove('open');
+      entriesSection.style.display = 'block';
+      if (viewingEntry) openEditor(viewingEntry);
+    });
+
+    detailDelete.addEventListener('click', () => {
+      if (viewingEntry) {
+        deleteEntry(viewingEntry.id);
+        entryDetail.classList.remove('open');
+        entriesSection.style.display = 'block';
+        viewingEntry = null;
+      }
+    });
+
+    // ─── Delete entry ───
+    async function deleteEntry(id) {
+      if (!confirm('Delete this entry? This cannot be undone.')) return;
+      try {
+        await deleteDoc(doc(db, 'entries', id));
+        showToast('Entry deleted');
+      } catch (e) {
+        showToast('Error deleting entry.');
+        console.error(e);
+      }
+    }
+
+    // ─── Helpers ───
+    function formatDate(ts) {
+      if (!ts) return new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+
+</html>
